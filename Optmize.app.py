@@ -33,10 +33,40 @@ if uploaded_file:
 
         df = df.fillna("Unknown")
 
-        # -------- BOM --------
-        bom = df.groupby(["Name", "L1", "W1"]).size().reset_index(name="Qty")
-        st.subheader("🧾 BOM")
-        st.dataframe(bom)
+        # -------- CLEAN COLUMN NAMES --------
+df.columns = df.columns.str.strip()
+
+# Show columns for debugging
+st.write("Detected Columns:", df.columns.tolist())
+
+# Try to auto-map columns
+col_map = {}
+
+for col in df.columns:
+    c = col.lower()
+    if "name" in c:
+        col_map["Name"] = col
+    elif "l1" in c or "length" in c:
+        col_map["L1"] = col
+    elif "w1" in c or "width" in c:
+        col_map["W1"] = col
+
+# Check if required columns exist
+if len(col_map) < 3:
+    st.error("❌ Required columns not found. Please ensure columns like Name, Length, Width exist.")
+    st.stop()
+
+# Rename columns safely
+df = df.rename(columns={
+    col_map["Name"]: "Name",
+    col_map["L1"]: "L1",
+    col_map["W1"]: "W1"
+})
+
+# -------- BOM --------
+bom = df.groupby(["Name", "L1", "W1"]).size().reset_index(name="Qty")
+st.subheader("🧾 BOM")
+st.dataframe(bom)
 
         # -------- CUTRITE EXPORT --------
         cutrite = bom.copy()
