@@ -29,9 +29,9 @@ if uploaded_file:
     blade = st.sidebar.number_input("Blade Thickness", value=3)
     rotation = st.sidebar.checkbox("Allow Rotation", True)
 
-    if st.button("🚀 Run Tool"):
+if st.button("🚀 Run Tool"):
 
-        df = df.fillna("Unknown")
+    df = df.fillna("Unknown")
 
         # -------- CLEAN COLUMN NAMES --------
 df.columns = df.columns.str.strip()
@@ -63,16 +63,15 @@ df = df.rename(columns={
     col_map["W1"]: "W1"
 })
 
-# -------- BOM --------
-bom = df.groupby(["Name", "L1", "W1"]).size().reset_index(name="Qty")
-st.subheader("🧾 BOM")
-st.dataframe(bom)
+    # -------- BOM --------
+    bom = df.groupby(["Name", "L1", "W1"]).size().reset_index(name="Qty")
+    st.dataframe(bom)
 
-        # -------- CUTRITE EXPORT --------
-        cutrite = bom.copy()
-        cutrite["Material"] = "Board"
-        cutrite["Grain"] = "Yes"
-        cutrite.to_csv("cutrite.csv", index=False)
+    # -------- CUTRITE EXPORT --------
+    cutrite = bom.copy()
+    cutrite["Material"] = "Board"
+    cutrite["Grain"] = "Yes"
+    cutrite.to_csv("cutrite.csv", index=False)
 
         # -------- CUTTING LAYOUT --------
         packer = newPacker(rotation=rotation)
